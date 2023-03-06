@@ -1,7 +1,9 @@
 # This file was created to run the application on heroku using gunicorn.
 # Read more about it here: https://devcenter.heroku.com/articles/python-gunicorn
 
-from src.app import app as application
+from api import create_app
 
-if __name__ == "__main__":
-    application.run()
+app = create_app()
+
+if __name__ == '__main__':
+    app.run()
