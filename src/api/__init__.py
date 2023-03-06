@@ -1,12 +1,3 @@
-from flask import Flask
+from flask import Blueprint
 
-def create_app():
-    app = Flask(__name__)
-
-    # Configuración de la aplicación
-
-    # Registro de blueprints
-    from .routes import api
-    app.register_blueprint(api, url_prefix='/api')
-
-    return app
+api = Blueprint("api", __name__)
