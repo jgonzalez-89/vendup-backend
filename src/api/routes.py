@@ -157,11 +157,16 @@ def delete_user(id):
 
 ##################### Endpoints de Products #####################
 
-
 @api.route("/products", methods=["GET"])
 def get_all_products():
     products = Product.query.all()
     return jsonify({"product": [serialize_product(product) for product in products]})
+# @api.route("/products", methods=["GET"])
+# def get_all_products():
+#     limit = 100
+#     offset = request.args.get('offset', default=0, type=int)
+#     products = Product.query.limit(limit).offset(offset).all()  # Limitar la cantidad de productos devueltos a 9 y agregar el valor de desplazamiento
+#     return jsonify({"product": [serialize_product(product) for product in products]})
 
 
 @api.route("/products/<int:id>", methods=["GET"])
