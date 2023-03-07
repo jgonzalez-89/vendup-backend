@@ -159,7 +159,7 @@ def delete_user(id):
 
 @api.route("/products", methods=["GET"])
 def get_all_products():
-    products = Product.query.all()
+    products = Product.query.order_by(Product.created_at_product.desc()).all()
     return jsonify({"product": [serialize_product(product) for product in products]})
 # @api.route("/products", methods=["GET"])
 # def get_all_products():
