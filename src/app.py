@@ -11,6 +11,8 @@ from api.commands import setup_commands
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
+from threading import Timer
+import requests
 
 
 ENV = os.getenv("FLASK_DEBUG")
@@ -52,15 +54,11 @@ setup_commands(app)
 app.register_blueprint(api, url_prefix="/api")
 
 # Handle/serialize errors like a JSON object
-
-
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
-
 # generate sitemap with all your endpoints
-
 @app.route("/register", methods=["POST"])
 def register():
     email = request.json.get("email", None)
@@ -86,7 +84,6 @@ def register():
         "message": "Registered successfully",
         "access_token": access_token
     })
-
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -129,6 +126,22 @@ def serve_any_other_file(path):
     return response
 
 
+@app.route('/heartbeat')
+def heartbeat_route():
+    return jsonify({'message': 'heartbeat'})
+
+def heartbeat():
+    url = 'http://localhost:3001/heartbeat'
+    response = requests.get(url)
+    print('Heartbeat:', response.status_code)
+
+def start_heartbeat():
+    # Ejecutar la función heartbeat cada 5 minutos
+    interval = 5 * 60  # segundos
+    timer = Timer(interval, heartbeat)
+    timer.start()
+
 if __name__ == "__main__":
     PORT = int(os.environ.get("PORT", 3001))
+    start_heartbeat()
     app.run(host="0.0.0.0", port=PORT)
