@@ -97,32 +97,6 @@ Este es un correo electrónico automático, por favor no responda.
         print(e)
         return None
 
-# def send_confirmation_email(user_email, token):
-#     # Set your own "from" email in the environment variable
-#     # from_email = os.environ.get("FROM_EMAIL")
-#     from_email = "register.vendup@gmail.com"
-#     to_email = user_email
-#     subject = "Account confirmation"
-#     confirmation_url = url_for("confirm_email", token=token, _external=True)
-#     content = f"""\
-# Please click on the link below to confirm your registration:
-# <a href="{confirmation_url}">{confirmation_url}</a>
-# """
-#     message = Mail(
-#         from_email=from_email,
-#         to_emails=to_email,
-#         subject=subject,
-#         html_content=content,
-#     )
-
-#     try:
-#         sg = SendGridAPIClient(app.config["SENDGRID_API_KEY"])
-#         response = sg.send(message)
-#         return response.status_code
-#     except Exception as e:
-#         print(e)
-#         return None
-
 
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
