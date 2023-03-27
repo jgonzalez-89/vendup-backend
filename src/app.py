@@ -144,7 +144,22 @@ def confirm_email(token):
     user.is_active = True
     db.session.commit()
 
-    return jsonify({"message": "Account confirmed successfully", "status": 200})
+    return """
+        <html>
+        <head>
+            <title>Confirmation Success</title>
+            <script>
+                setTimeout(() => {
+                    window.close();
+                }, 3000); // 3 segundos de demora antes de cerrar la ventana
+            </script>
+        </head>
+        <body>
+            <h1>¡Gracias por confirmar tu cuenta!</h1>
+            <p>Tu cuenta ha sido confirmada exitosamente.</p>
+        </body>
+        </html>
+    """
 
 
 @app.route("/login", methods=["POST"])
@@ -161,6 +176,9 @@ def login():
 
     if not bcrypt.check_password_hash(user.hash, password):
         return jsonify({"message": "Invalid email or password", "status": 401})
+
+    if not user.is_active:
+        return jsonify({"message": "Inactive user", "status": 401})
 
     access_token = create_access_token(
         identity=user.id, expires_delta=timedelta(minutes=30))
@@ -189,29 +207,3 @@ def serve_any_other_file(path):
 
 if __name__ == '__main__':
     app.run()
-
-
-# @app.route("/register", methods=["POST"])
-# def register():
-#     email = request.json.get("email", None)
-#     password = request.json.get("password", None)
-
-#     if not email or not password:
-#         return jsonify({"message": "Missing email or password", "status": 400})
-
-#     existing_user = User.query.filter_by(email=email).first()
-#     if existing_user:
-#         return jsonify({"message": "Email already registered", "status": 400})
-
-#     hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
-#     new_user = User(email=email, hash=hashed_password)
-#     db.session.add(new_user)
-#     db.session.commit()
-
-#     access_token = create_access_token(
-#         identity=new_user.id, expires_delta=timedelta(minutes=30))
-
-#     return jsonify({
-#         "message": "Registered successfully",
-#         "access_token": access_token
-#     })

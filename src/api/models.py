@@ -50,7 +50,7 @@ class Purchase(db.Model):
     created_at_shopping = db.Column(db.DateTime)
     updated_at_shopping = db.Column(db.DateTime)
     price = db.Column(db.Numeric(precision=8, scale=2))
-    status_paid = db.Column(db.Enum("paid", "pending", "refunded", name="status_paid_enum_a5"))
+    status_paid = db.Column(db.Enum("paid", "pending", "refunded", name="status_paid_enum_a7"))
     paid_at = db.Column(db.DateTime)
     purchase_method = db.Column(db.String)
     commission = db.Column(db.Numeric(6, 2))

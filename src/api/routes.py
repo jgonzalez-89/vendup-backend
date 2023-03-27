@@ -157,10 +157,12 @@ def delete_user(id):
 
 ##################### Endpoints de Products #####################
 
+
 @api.route("/products", methods=["GET"])
 def get_all_products():
     products = Product.query.order_by(Product.created_at_product.desc()).all()
     return jsonify({"product": [serialize_product(product) for product in products]})
+
 # @api.route("/products", methods=["GET"])
 # def get_all_products():
 #     limit = 100
@@ -211,8 +213,10 @@ def update_product(id):
     product.price = data.get("price", product.price)
     product.premium = data.get("premium", product.premium)
     product.images = data.get("images", product.images)
-    product.created_at_product = data.get("created_at_product", product.created_at_product)
-    product.status_shooping = data.get("status_shooping", product.status_shooping)
+    product.created_at_product = data.get(
+        "created_at_product", product.created_at_product)
+    product.status_shooping = data.get(
+        "status_shooping", product.status_shooping)
 
     db.session.commit()
     return jsonify({"product": serialize_product(product)})
