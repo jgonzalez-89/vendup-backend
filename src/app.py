@@ -93,6 +93,7 @@ Este es un correo electrónico automático, por favor no responda.
     try:
         sg = SendGridAPIClient(app.config["SENDGRID_API_KEY"])
         response = sg.send(message)
+        print(response.status_code)
         return response.status_code
     except Exception as e:
         print(e)
