@@ -3,7 +3,7 @@ import random
 import requests
 import json
 from sqlalchemy import func
-from src.api.models import db, User, Product
+from api.models import db, User, Product
 from datetime import datetime
 from flask_bcrypt import Bcrypt
 

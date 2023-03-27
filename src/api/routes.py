@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, jsonify, url_for, Blueprint
-from src.api.models import db, User, Product, Purchase
-from src.api.utils import generate_sitemap, APIException
+from api.models import db, User, Product, Purchase
+from api.utils import generate_sitemap, APIException
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 import stripe
