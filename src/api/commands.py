@@ -3,12 +3,12 @@ import random
 import requests
 import json
 from sqlalchemy import func
-from api.models import db, User, Product
+from src.api.models import db, User, Product
 from datetime import datetime
 from flask_bcrypt import Bcrypt
 
 
-with open("data.json", "r") as f:
+with open("src/data.json", "r") as f:
     data = json.load(f)
 
 # --------------- Use this command to create Users and Products ---------------

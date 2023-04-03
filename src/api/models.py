@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey, Enum
+from sqlalchemy import ForeignKey
 
 
 db = SQLAlchemy()
