@@ -31,16 +31,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia la carpeta src con el código de la aplicación
 COPY src/ src/
 
-ENV DATABASE_URL=postgres://vendup_database_user:czJpBXAXvKCbGqDbKNmSVOnX2k4XsnYT@dpg-cg2u29u4dada1e3dgvl0-a.frankfurt-postgres.render.com/vendup_database
-ENV FLASK_APP_KEY="any key works"
-ENV FLASK_APP=src/app.py
-ENV FLASK_DEBUG=1
-ENV PIPENV_VERBOSITY=-1
-ENV FLASK_STRIPE_KEY="sk_test_51Mf8aTJwZ9bnrLE9ecLR2q1QeoFpuh4A8qCTK8GojuhuYZ8FQNsSYmykb2jrcgH8Rznu8tI9GX8op4sILcUkBUoD00BFItNCIy"
-ENV SENDGRID_API_KEY='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'
-
-
-
 # Expone el puerto en el que se ejecutará la aplicación
 EXPOSE 5000
 
