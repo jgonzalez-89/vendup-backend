@@ -11,9 +11,10 @@ from src.api.commands import setup_commands
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from flask_bcrypt import Bcrypt
 from datetime import timedelta
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
-from itsdangerous import URLSafeTimedSerializer
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 ENV = os.getenv("FLASK_DEBUG")
@@ -25,9 +26,11 @@ app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.url_map.strict_slashes = False
 
+# JWT Configuration
 app.config["JWT_SECRET_KEY"] = "jwt-secret-string"
 jwt = JWTManager(app)
 
+# database condiguration
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url.replace(
@@ -40,70 +43,27 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
 
+# Allow CORS requests to this API
 CORS(app)
 
+# add the admin
 setup_admin(app)
 
+# add the admin
 setup_commands(app)
 
+# Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix="/api")
 
-app.config['SENDGRID_API_KEY'] = os.environ.get('SENDGRID_API_KEY')
-serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-
-
-def send_confirmation_email(user_email, token):
-    # Personaliza el remitente del correo electrónico
-    from_email = "register.vendup@gmail.com"
-    to_email = user_email
-    # Personaliza el asunto del correo electrónico
-    subject = "Confirmación de registro en Vendup"
-    confirmation_url = url_for("confirm_email", token=token, _external=True)
-    # Agrega la URL de la imagen que deseas mostrar
-    image_url = "https://i.ibb.co/FKYfNK8/vendup-6ff606c6.png"
-    content = f"""\
-Hola,
-<br>
-<img src="{image_url}" alt="Vendup img">
-<br>
-Gracias por registrarte en Vendup. Para confirmar tu cuenta, por favor haz clic en el siguiente enlace:
-<br>
-<br>
-<br>
-<a href="{confirmation_url}">{confirmation_url}</a><br>
-<br>
-<br>
-<br>
-Si no solicitaste este registro, por favor ignora este correo electrónico.
-<br>
-<br>
-Saludos cordiales,
-El equipo de Vendup
-<br>
-<br>
-Este es un correo electrónico automático, por favor no responda.
-"""
-    message = Mail(
-        from_email=from_email,
-        to_emails=to_email,
-        subject=subject,
-        html_content=content,
-    )
-
-    try:
-        sg = SendGridAPIClient(app.config["SENDGRID_API_KEY"])
-        response = sg.send(message)
-        print(response.status_code)
-        return response.status_code
-    except Exception as e:
-        print(e)
-        return None
+# Handle/serialize errors like a JSON object
 
 
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
+
+# generate sitemap with all your endpoints
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -118,50 +78,19 @@ def register():
         return jsonify({"message": "Email already registered", "status": 400})
 
     hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
-    new_user = User(email=email, hash=hashed_password, is_active=False)
+    new_user = User(email=email, hash=hashed_password)
     db.session.add(new_user)
     db.session.commit()
 
-    token = serializer.dumps(new_user.email, salt="email-confirm")
-    send_confirmation_email(new_user.email, token)
+    # Generar el token de acceso
+    access_token = create_access_token(
+        identity=new_user.id, expires_delta=timedelta(minutes=30))
 
     return jsonify({
-        "message": "Registered successfully. Please check your email to confirm your account.",
-        "status": 200
+        "status": 200,
+        "message": "Registered successfully",
+        "access_token": access_token
     })
-
-
-@app.route("/confirm-email/<token>", methods=["GET"])
-def confirm_email(token):
-    try:
-        email = serializer.loads(token, salt="email-confirm", max_age=3600)
-    except Exception as e:
-        return jsonify({"message": "Invalid or expired token", "status": 400})
-
-    user = User.query.filter_by(email=email).first()
-
-    if user.is_active:
-        return jsonify({"message": "Account already confirmed", "status": 200})
-
-    user.is_active = True
-    db.session.commit()
-
-    return """
-        <html>
-        <head>
-            <title>Confirmation Success</title>
-            <script>
-                setTimeout(() => {
-                    window.close();
-                }, 3000); // 3 segundos de demora antes de cerrar la ventana
-            </script>
-        </head>
-        <body>
-            <h1>¡Gracias por confirmar tu cuenta!</h1>
-            <p>Tu cuenta ha sido confirmada exitosamente.</p>
-        </body>
-        </html>
-    """
 
 
 @app.route("/login", methods=["POST"])
@@ -179,9 +108,7 @@ def login():
     if not bcrypt.check_password_hash(user.hash, password):
         return jsonify({"message": "Invalid email or password", "status": 401})
 
-    if not user.is_active:
-        return jsonify({"message": "Inactive user", "status": 401})
-
+    # Generar el token de acceso
     access_token = create_access_token(
         identity=user.id, expires_delta=timedelta(minutes=30))
 
