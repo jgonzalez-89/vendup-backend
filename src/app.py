@@ -17,6 +17,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+print("FLASK_APP_KEY:", os.environ.get("FLASK_APP_KEY"))
+print("FLASK_APP:", os.environ.get("FLASK_APP"))
+print("FLASK_DEBUG:", os.environ.get("FLASK_DEBUG"))
+print("FLASK_STRIPE_KEY:", os.environ.get("FLASK_STRIPE_KEY"))
+
+
 ENV = os.getenv("FLASK_DEBUG")
 static_file_dir = os.path.join(
     os.path.dirname(os.path.realpath(__file__)), "../public/"
